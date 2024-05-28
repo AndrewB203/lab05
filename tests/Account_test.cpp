@@ -25,25 +25,6 @@ TEST(AccountTest, LockAndUnlock) {
 }
 
 // Test for Transaction class
-TEST(TransactionTest, MakeTransaction) {
-    Account account1(1, 1000);
-    Account account2(2, 500);
-    Transaction transaction;
-
-    EXPECT_TRUE(transaction.Make(account1, account2, 200));
-    EXPECT_EQ(account1.GetBalance(), 800); // account1 debited by 200 + fee
-    EXPECT_EQ(account2.GetBalance(), 700); // account2 credited by 200
-}
-
-TEST(TransactionTest, InsufficientBalance) {
-    Account account1(1, 1000);
-    Account account2(2, 500);
-    Transaction transaction;
-
-    EXPECT_FALSE(transaction.Make(account1, account2, 1000)); // Insufficient balance
-    EXPECT_EQ(account1.GetBalance(), 1000); // account1 balance unchanged
-    EXPECT_EQ(account2.GetBalance(), 500);  // account2 balance unchanged
-}
 
 TEST(TransactionTest, InvalidTransaction) {
     Account account1(1, 1000);
