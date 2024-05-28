@@ -31,8 +31,8 @@ jobs:
       run: |
         echo ${{ github.workspace }}
         ls ${{ github.workspace }}/build 
-        chmod +x ${{ github.workspace }}/build/ProtoBank# Добавляем разрешение на выполнение
-        ${{ github.workspace }}/build/ProtoBank # Запускаем ProtoZoo
+        chmod +x ${{ github.workspace }}/build/ProtoBank #Добавляем разрешение на выполнение
+        ${{ github.workspace }}/build/ProtoBank #Запускаем ProtoZoo
       working-directory: ${{ github.workspace }}
 
     
