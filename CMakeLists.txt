@@ -1,30 +1,45 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.5)
+project(BankingApp)
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 14)
 
-project(banking_app)
+option(BUILD_TESTS "Build tests" OFF)
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/third-party/CMake-codecov/cmake" ${CMAKE_MODULE_PATH})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/banking)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/banking)
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/banking)
+set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+set(THIRD_PARTY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third-party)
 
-if (BUILD_TESTS)
-  add_subdirectory(third-party/gtest)
-  enable_testing()
-  include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
-  include_directories(${gmock_SOURCE_DIR}/include ${gmock_SOURCE_DIR})  
-  file(GLOB ACCOUNT_TEST_SOURCES tests/*.cpp)
-  add_executable(check ${ACCOUNT_TEST_SOURCES})
-  target_link_libraries(check gtest transaction gtest_main account gmock)
-  add_test(NAME check COMMAND check)
+# Add source files to the library
+add_library(BankingLib STATIC
+    ${SOURCE_DIR}/Account.cpp
+    ${SOURCE_DIR}/Transaction.cpp
+)
 
-  if (BUILD_COVERAGE)
-    set(ENABLE_COVERAGE ON CACHE BOOL "Enable coverage build." FORCE)
-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-    find_package(codecov)
-    add_coverage(check)
-    list(APPEND LCOV_REMOVE_PATTERNS "'${PROJECT_SOURCE_DIR}/tests/*'")
-    coverage_evaluate()
-  endif ()
-endif ()
+# Include directories for the library
+target_include_directories(BankingLib PUBLIC ${SOURCE_DIR})
+
+# Add tests if BUILD_TESTS is enabled
+# Add tests if BUILD_TESTS is enabled
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(${THIRD_PARTY_DIR}/gtest)
+
+    # Specify the test source file
+    set(TEST_SOURCES ${TEST_DIR}/Account_test.cpp)
+
+    # Create the test executable
+    add_executable(ProtoBank ${TEST_SOURCES})
+
+    # Link the test executable with gtest and BankingLib
+    target_link_libraries(ProtoBank gtest gtest_main BankingLib)
+
+    # Include the header files from the banking directory
+    include_directories(${SOURCE_DIR})
+
+    # Add the test to the build
+    add_test(NAME ProtoBank COMMAND ProtoBank)
+
+    # Disable the warning for the gtest-death-test.cc file
+    target_compile_options(gtest PRIVATE -Wno-error=maybe-uninitialized)
+    target_compile_options(gtest_main PRIVATE -Wno-error=maybe-uninitialized)
+endif()

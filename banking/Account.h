@@ -17,7 +17,7 @@ class Account {
   virtual void Unlock();
   int id() const { return id_; }
 
- private:
+ public:
   int id_;
   int balance_;
   bool is_locked_;
